@@ -1,15 +1,21 @@
 const STORAGE_KEY = "kibabiiAnnouncements";
 
-const clubSelect = document.getElementById("clubSelect");
-const messageInput = document.getElementById("messageInput");
-const publishBtn = document.getElementById("publishBtn");
-const statusMessage = document.getElementById("statusMessage");
-const adminList = document.getElementById("adminList");
+document.addEventListener("DOMContentLoaded", function () {
+  const clubSelect = document.getElementById("clubSelect");
+  const messageInput = document.getElementById("messageInput");
+  const publishBtn = document.getElementById("publishBtn");
+  const statusMessage = document.getElementById("statusMessage");
+  const adminList = document.getElementById("adminList");
 
-if (clubSelect && messageInput && publishBtn && statusMessage && adminList) {
+  if (!clubSelect || !messageInput || !publishBtn || !statusMessage || !adminList) {
+    console.warn("Admin page elements not found. This script is being ignored.");
+    return;
+  }
+
   function loadAnnouncements() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
     } catch (e) {
       return [];
     }
@@ -71,14 +77,19 @@ if (clubSelect && messageInput && publishBtn && statusMessage && adminList) {
       text: message,
       date: new Date().toLocaleString()
     });
+
     saveAnnouncements(list);
 
     messageInput.value = "";
     statusMessage.textContent = "Published!";
+
     renderAdminList();
+
+    // Optional: redirect to announcements page after a short delay
+    setTimeout(function () {
+      window.location.href = "announcements.html";
+    }, 600);
   });
 
   renderAdminList();
-} else {
-  console.warn("Admin page elements not found. This script is being ignored.");
-}
+});
