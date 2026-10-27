@@ -1,65 +1,73 @@
-const feed = document.getElementById("feed");
-const searchInput = document.getElementById("searchInput");
-const noResults = document.getElementById("noResults");
+const STORAGE_KEY = "kibabiiAnnouncements";
 
-function loadAnnouncements() {
-  try {
-    return JSON.parse(localStorage.getItem("kibabiiAnnouncements")) || [];
-  } catch (e) {
-    return [];
+document.addEventListener("DOMContentLoaded", function () {
+  const feed = document.getElementById("feed");
+  const searchInput = document.getElementById("searchInput");
+  const noResults = document.getElementById("noResults");
+
+  function loadAnnouncements() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
   }
-}
 
-function renderFeed() {
-  const list = loadAnnouncements();
-  const query = (searchInput ? searchInput.value.trim().toLowerCase() : "");
+  function renderFeed() {
+    const list = loadAnnouncements();
+    const query = (searchInput ? searchInput.value.trim().toLowerCase() : "");
 
-  feed.innerHTML = "";
+    if (!feed) return;
 
-  const filteredList = list.filter(function (item) {
-    if (!query) return true;
+    feed.innerHTML = "";
 
-    const clubMatch = (item.club || "").toLowerCase().includes(query);
-    const textMatch = (item.text || "").toLowerCase().includes(query);
-    const dateMatch = (item.date || "").toLowerCase().includes(query);
+    const filteredList = list.filter(function (item) {
+      if (!query) return true;
 
-    return clubMatch || textMatch || dateMatch;
-  });
+      const clubMatch = (item.club || "").toLowerCase().includes(query);
+      const textMatch = (item.text || "").toLowerCase().includes(query);
+      const dateMatch = (item.date || "").toLowerCase().includes(query);
 
-  if (filteredList.length === 0) {
-    const empty = document.createElement("article");
-    const p = document.createElement("p");
-    p.textContent = "No announcement matches your search.";
-    empty.appendChild(p);
-    feed.appendChild(empty);
+      return clubMatch || textMatch || dateMatch;
+    });
+
+    if (filteredList.length === 0) {
+      const empty = document.createElement("article");
+      const p = document.createElement("p");
+      p.textContent = "No announcement has been made yet.";
+      empty.appendChild(p);
+      feed.appendChild(empty);
+
+      if (noResults) {
+        noResults.style.display = "block";
+        noResults.textContent = "No announcement has been made yet.";
+      }
+
+      return;
+    }
 
     if (noResults) {
-      noResults.style.display = "block";
+      noResults.style.display = "none";
     }
-    return;
+
+    filteredList.forEach(function (item) {
+      const card = document.createElement("article");
+
+      const title = document.createElement("h2");
+      title.textContent = item.club;
+
+      const text = document.createElement("p");
+      text.textContent = item.text;
+
+      const date = document.createElement("small");
+      date.textContent = item.date;
+
+      card.append(title, text, date);
+      feed.appendChild(card);
+    });
   }
 
-  if (noResults) {
-    noResults.style.display = "none";
-  }
-
-  filteredList.forEach(function (item) {
-    const card = document.createElement("article");
-    const title = document.createElement("h2");
-    title.textContent = item.club;
-
-    const text = document.createElement("p");
-    text.textContent = item.text;
-
-    const date = document.createElement("small");
-    date.textContent = item.date;
-
-    card.append(title, text, date);
-    feed.appendChild(card);
-  });
-}
-
-if (feed) {
   renderFeed();
 
   if (searchInput) {
@@ -67,6 +75,4 @@ if (feed) {
   }
 
   window.addEventListener("storage", renderFeed);
-} else {
-  console.warn("No #feed element found on this page.");
-}
+});
