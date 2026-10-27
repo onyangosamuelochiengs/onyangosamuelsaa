@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Kibabii University</title>
+</head>
+<body>
+  <header>
+    <img src="images/logo.jpg" alt="Kibabii University logo" class="logo">
+    <h1>Admin: Post an Announcement</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="clubs.html">Clubs</a>
+      <a href="announcements.html">Announcements</a>
+    </nav>
+  </header>
+
+  <main>
+    <article>
+      <h2>New announcement</h2>
+
+      <label for="clubSelect">Club:</label>
+      <select id="clubSelect" class="admin-field">
+        <option>School Of Computing And Informatics (SCAI)</option>
+        <option>Kibabii University Christian Union (KIBUCU)</option>
+        <option>School Of Nursing</option>
+        <option>Faculty Of Science (FS)</option>
+        <option>Faculty Of Arts And Social Sciences (FASS)</option>
+        <option>School Of Business And Economics (SOBE)</option>
+        <option>Debate Club</option>
+        <option>Environmental Club</option>
+        <option>Music and Drama Club</option>
+        <option>Sports Club</option>
+        <option>Entrepreneurship Club</option>
+      </select>
+
+      <label for="messageInput">Announcement:</label>
+      <textarea id="messageInput" class="admin-field" rows="4" placeholder="Type your announcement here..."></textarea>
+
+      <button id="publishBtn" class="publish-btn">Publish</button>
+      <p id="statusMessage"></p>
+    </article>
+
+    <h2>Published announcements</h2>
+    <div id="adminList"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Kibabii University Clubs Portal</p>
+  </footer>
+
+  <script src="admin.js"></script>
+</body>
+</html>

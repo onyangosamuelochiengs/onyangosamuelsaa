@@ -1,0 +1,226 @@
+/* Basic page setup */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Header and title */
+header {
+  background-color: #1a5c2e;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0 0 10px 0;
+}
+
+header h1 a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Menu */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  background-color: #2e8b4a;
+}
+
+/* Main content */
+main {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 15px;
+}
+
+/* Club and announcement cards */
+article {
+  background-color: white;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border-left: 5px solid #1a5c2e;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+article h2 {
+  margin-top: 0;
+  color: #1a5c2e;
+}
+
+/* WhatsApp join button */
+article a {
+  display: inline-block;
+  background-color: #25d366;
+  color: white;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+article a:hover {
+  background-color: #1da851;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #1a5c2e;
+  color: white;
+  margin-top: 30px;
+}
+.logo {
+    height: 70px;
+    width: auto;
+}
+/* Sub-clubs inside a club card */
+article h3 {
+  color: #1a5c2e;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.sub-clubs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sub-clubs li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.sub-clubs li:last-child {
+  border-bottom: none;
+}
+
+.sub-clubs a {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+}
+.search-bar {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 2px solid #1a5c2e;
+  border-radius: 25px;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.search-bar:focus {
+  border-color: #25d366;
+}
+
+.no-results {
+  display: none;
+  text-align: center;
+  color: #666;
+}
+.admin-field {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 14px 0;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.publish-btn {
+  background-color: #1a5c2e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.publish-btn:hover {
+  background-color: #2e8b4a;
+}
+
+.delete-btn {
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+article small {
+  display: block;
+  color: #777;
+  margin-top: 6px;
+}
+/* Phones and small screens */
+@media (max-width: 600px) {
+      .sub-clubs a {
+    display: inline-block;
+    padding: 8px 16px;
+  }
+  body {
+    font-size: 16px;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  nav a {
+    display: block;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+  }
+
+  main {
+    margin: 15px auto;
+    padding: 0 10px;
+  }
+
+  article {
+    padding: 12px 15px;
+  }
+
+  article a {
+    display: block;
+    text-align: center;
+    padding: 12px;
+  }
+}
