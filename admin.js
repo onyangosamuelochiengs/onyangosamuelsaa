@@ -1,95 +1,107 @@
-const STORAGE_KEY = "kibabiiAnnouncements";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { firebaseConfig } from "./firebase-config.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  const clubSelect = document.getElementById("clubSelect");
-  const messageInput = document.getElementById("messageInput");
-  const publishBtn = document.getElementById("publishBtn");
-  const statusMessage = document.getElementById("statusMessage");
-  const adminList = document.getElementById("adminList");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const announcements = collection(db, "announcements");
 
-  if (!clubSelect || !messageInput || !publishBtn || !statusMessage || !adminList) {
-    console.warn("Admin page elements not found. This script is being ignored.");
+const loginBox = document.getElementById("loginBox");
+const adminPanel = document.getElementById("adminPanel");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const loginStatus = document.getElementById("loginStatus");
+const publishBtn = document.getElementById("publishBtn");
+const statusMessage = document.getElementById("statusMessage");
+const adminList = document.getElementById("adminList");
+
+let stopListening = null;
+
+// ---- Login ----
+loginBtn.addEventListener("click", async () => {
+  loginStatus.textContent = "Logging in...";
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("emailInput").value.trim(),
+      document.getElementById("passwordInput").value
+    );
+    loginStatus.textContent = "";
+  } catch (err) {
+    loginStatus.textContent = "Login failed. Check your email and password.";
+  }
+});
+
+logoutBtn.addEventListener("click", () => signOut(auth));
+
+onAuthStateChanged(auth, (user) => {
+  const loggedIn = !!user;
+  loginBox.style.display = loggedIn ? "none" : "block";
+  adminPanel.style.display = loggedIn ? "block" : "none";
+
+  if (stopListening) { stopListening(); stopListening = null; }
+  if (loggedIn) listen();
+  else adminList.innerHTML = "";
+});
+
+// ---- Publish ----
+publishBtn.addEventListener("click", async () => {
+  const club = document.getElementById("clubSelect").value;
+  const message = document.getElementById("messageInput").value.trim();
+
+  if (!message) {
+    statusMessage.textContent = "Please type an announcement first.";
     return;
   }
 
-  function loadAnnouncements() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      return [];
-    }
+  publishBtn.disabled = true;
+  statusMessage.textContent = "Publishing...";
+  try {
+    await addDoc(announcements, { club, message, createdAt: serverTimestamp() });
+    document.getElementById("messageInput").value = "";
+    statusMessage.textContent = "Published! Everyone can now see it.";
+  } catch (err) {
+    statusMessage.textContent = "Could not publish. Make sure you are logged in.";
   }
+  publishBtn.disabled = false;
+});
 
-  function saveAnnouncements(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  }
-
-  function renderAdminList() {
-    const list = loadAnnouncements();
+// ---- Show + delete published announcements ----
+function listen() {
+  const q = query(announcements, orderBy("createdAt", "desc"));
+  stopListening = onSnapshot(q, (snapshot) => {
     adminList.innerHTML = "";
-
-    if (list.length === 0) {
-      adminList.textContent = "Nothing published yet.";
-      return;
-    }
-
-    list.forEach(function (item) {
+    snapshot.forEach((d) => {
+      const data = d.data();
       const card = document.createElement("article");
 
-      const title = document.createElement("h3");
-      title.textContent = item.club;
+      const h = document.createElement("h2");
+      h.textContent = data.club;
 
-      const text = document.createElement("p");
-      text.textContent = item.text;
+      const p = document.createElement("p");
+      p.textContent = data.message;
 
-      const date = document.createElement("small");
-      date.textContent = item.date;
+      const small = document.createElement("small");
+      small.textContent = data.createdAt ? data.createdAt.toDate().toLocaleString() : "Just now";
 
       const del = document.createElement("button");
-      del.textContent = "Delete";
       del.className = "delete-btn";
-      del.addEventListener("click", function () {
-        const remaining = loadAnnouncements().filter(function (a) {
-          return a.id !== item.id;
-        });
-        saveAnnouncements(remaining);
-        renderAdminList();
+      del.textContent = "Delete";
+      del.addEventListener("click", async () => {
+        if (confirm("Delete this announcement?")) {
+          await deleteDoc(doc(db, "announcements", d.id));
+        }
       });
 
-      card.append(title, text, date, del);
+      card.append(h, p, small, del);
       adminList.appendChild(card);
     });
-  }
-
-  publishBtn.addEventListener("click", function () {
-    const message = messageInput.value.trim();
-
-    if (message === "") {
-      statusMessage.textContent = "Please type an announcement first.";
-      return;
-    }
-
-    const list = loadAnnouncements();
-    list.unshift({
-      id: Date.now(),
-      club: clubSelect.value,
-      text: message,
-      date: new Date().toLocaleString()
-    });
-
-    saveAnnouncements(list);
-
-    messageInput.value = "";
-    statusMessage.textContent = "Published!";
-
-    renderAdminList();
-
-    // Optional: redirect to announcements page after a short delay
-    setTimeout(function () {
-      window.location.href = "announcements.html";
-    }, 600);
   });
-
-  renderAdminList();
-});
+}
