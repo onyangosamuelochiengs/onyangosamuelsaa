@@ -1,78 +1,50 @@
-const STORAGE_KEY = "kibabiiAnnouncements";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, collection, onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  const feed = document.getElementById("feed");
-  const searchInput = document.getElementById("searchInput");
-  const noResults = document.getElementById("noResults");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  function loadAnnouncements() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      return [];
-    }
-  }
+const feed = document.getElementById("feed");
+const searchInput = document.getElementById("searchInput");
+const noResults = document.getElementById("noResults");
 
-  function renderFeed() {
-    const list = loadAnnouncements();
-    const query = (searchInput ? searchInput.value.trim().toLowerCase() : "");
+function applySearch() {
+  const term = searchInput.value.toLowerCase();
+  let shown = 0;
+  feed.querySelectorAll("article").forEach((card) => {
+    const match = card.textContent.toLowerCase().includes(term);
+    card.style.display = match ? "" : "none";
+    if (match) shown++;
+  });
+  noResults.style.display = shown === 0 ? "block" : "none";
+}
 
-    if (!feed) return;
+searchInput.addEventListener("input", applySearch);
 
-    feed.innerHTML = "";
+const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
 
-    const filteredList = list.filter(function (item) {
-      if (!query) return true;
+onSnapshot(q, (snapshot) => {
+  feed.innerHTML = "";
+  snapshot.forEach((d) => {
+    const data = d.data();
+    const card = document.createElement("article");
 
-      const clubMatch = (item.club || "").toLowerCase().includes(query);
-      const textMatch = (item.text || "").toLowerCase().includes(query);
-      const dateMatch = (item.date || "").toLowerCase().includes(query);
+    const h = document.createElement("h2");
+    h.textContent = data.club;
 
-      return clubMatch || textMatch || dateMatch;
-    });
+    const p = document.createElement("p");
+    p.textContent = data.message;
 
-    if (filteredList.length === 0) {
-      const empty = document.createElement("article");
-      const p = document.createElement("p");
-      p.textContent = "No announcement has been made yet.";
-      empty.appendChild(p);
-      feed.appendChild(empty);
+    const small = document.createElement("small");
+    small.textContent = data.createdAt ? data.createdAt.toDate().toLocaleString() : "Just now";
 
-      if (noResults) {
-        noResults.style.display = "block";
-        noResults.textContent = "No announcement has been made yet.";
-      }
-
-      return;
-    }
-
-    if (noResults) {
-      noResults.style.display = "none";
-    }
-
-    filteredList.forEach(function (item) {
-      const card = document.createElement("article");
-
-      const title = document.createElement("h2");
-      title.textContent = item.club;
-
-      const text = document.createElement("p");
-      text.textContent = item.text;
-
-      const date = document.createElement("small");
-      date.textContent = item.date;
-
-      card.append(title, text, date);
-      feed.appendChild(card);
-    });
-  }
-
-  renderFeed();
-
-  if (searchInput) {
-    searchInput.addEventListener("input", renderFeed);
-  }
-
-  window.addEventListener("storage", renderFeed);
+    card.append(h, p, small);
+    feed.appendChild(card);
+  });
+  applySearch();
+}, () => {
+  feed.innerHTML = "<p>Could not load announcements. Please try again later.</p>";
 });
