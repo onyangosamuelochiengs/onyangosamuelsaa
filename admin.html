@@ -18,6 +18,18 @@
   </header>
 
   <main>
+    <article id="loginBox">
+      <h2>Admin login</h2>
+      <label for="emailInput">Email:</label>
+      <input type="email" id="emailInput" class="admin-field" autocomplete="username">
+      <label for="passwordInput">Password:</label>
+      <input type="password" id="passwordInput" class="admin-field" autocomplete="current-password">
+      <button id="loginBtn" class="publish-btn">Log in</button>
+      <p id="loginStatus"></p>
+    </article>
+
+    <div id="adminPanel" style="display:none;">
+    <button id="logoutBtn" class="delete-btn">Log out</button>
     <article>
       <h2>New announcement</h2>
 
@@ -45,12 +57,13 @@
 
     <h2>Published announcements</h2>
     <div id="adminList"></div>
+    </div>
   </main>
 
   <footer>
     <p>&copy; 2026 Kibabii University Clubs Portal</p>
   </footer>
 
-  <script src="admin.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
