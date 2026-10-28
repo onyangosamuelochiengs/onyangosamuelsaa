@@ -24,6 +24,32 @@ const adminList = document.getElementById("adminList");
 
 let stopListening = null;
 
+// ---- Fill the club dropdown from clubs.html ----
+// Every club card on clubs.html (its <h2> title) becomes an option.
+// If clubs.html can't be read, the options already in admin.html stay as a backup.
+async function loadClubs() {
+  try {
+    const res = await fetch("clubs.html", { cache: "no-store" });
+    if (!res.ok) return;
+    const page = new DOMParser().parseFromString(await res.text(), "text/html");
+    const names = [...page.querySelectorAll("main article h2")]
+      .map((h) => h.textContent.trim())
+      .filter(Boolean);
+    if (names.length === 0) return;
+
+    const select = document.getElementById("clubSelect");
+    select.innerHTML = "";
+    names.forEach((name) => {
+      const option = document.createElement("option");
+      option.textContent = name;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    // keep the backup options
+  }
+}
+loadClubs();
+
 // ---- Login ----
 loginBtn.addEventListener("click", async () => {
   loginStatus.textContent = "Logging in...";
