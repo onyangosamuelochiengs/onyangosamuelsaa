@@ -224,3 +224,26 @@ article small {
     padding: 12px;
   }
 }
+
+/* Year of study buttons */
+.year-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.year-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.year-links a {
+  text-align: center;
+  padding: 10px;
+}
+
+@media (max-width: 600px) {
+  .year-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
